@@ -114,11 +114,11 @@ h2 {
 }
 
 #start-screen h1 {
-  color: yellow;
+  color: white;
   font-size: 4rem;
   margin-top: 40vh;
   margin-bottom: 40px;
-  animation: colours 1s infinite;
+  animation: colours 0.4s infinite;
 }
 
 #start-msg {
@@ -156,6 +156,15 @@ h2 {
 
 @keyframes colours {
   0% {
+    color: white;
+  }
+  50% {
+    color: red;
+  }
+}
+
+/* @keyframes colours {
+  0% {
     color: yellow;
   }
   31% {
@@ -173,7 +182,7 @@ h2 {
   99% {
     color: #0fd6cc;
   }
-}
+} */
 
 @keyframes blink {
   0% {
