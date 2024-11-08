@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const squares = [];
 
-  //create your board
+  //Membuat board/papan
   function createBoard() {
     for (let i = 0; i < layout.length; i++) {
       const square = document.createElement("div");
@@ -66,8 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   createBoard();
 
-  //create Characters
-  //draw pacman onto the board
+  //Membuat karakter
+  //membuat pacman masuk ke board
   let pacmanCurrentIndex = 490;
   let pacmanVelocity = {
     x: 0,
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // console.log(getCoordinates(pacmanCurrentIndex))
 
-  // set pacman velocity
+  //Mengatur kecepatan gerakan/velocity pacman
   function setPacmanVelocity(e) {
     switch (e.keyCode) {
       case 37:
@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log(pacmanVelocity, e.keyCode);
   }
 
-  //move pacman
+  //gerakan pacman
   function movePacman() {
     squares[pacmanCurrentIndex].classList.remove("pac-man");
     setInterval(() => {
@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, pacmanSpeed);
   }
 
-  // what happens when you eat a pac-dot
+  // fungsi untuk menentukan apakah pacman memakan pac-dot
   function pacDotEaten() {
     if (squares[pacmanCurrentIndex].classList.contains("pac-dot")) {
       score++;
@@ -207,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  //what happens when you eat a power-pellet
+  // fungsi untuk menentukan apakah pacman memakan power-pellet
   function powerPelletEaten() {
     if (squares[pacmanCurrentIndex].classList.contains("power-pellet")) {
       score += 10;
@@ -218,12 +218,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  //make the ghosts stop flashing
+  // Membuat hantu menjadi passive
   function unScareGhosts() {
     ghosts.forEach((ghost) => (ghost.isScared = false));
   }
 
-  //create ghosts using Constructors
+  // Membuat karakter hantu
   class Ghost {
     constructor(className, startIndex, speed) {
       this.className = className;
@@ -235,7 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  //all my ghosts
+  // Semua karakter hantu
   ghosts = [
     new Ghost("blinky", 348, 100),
     new Ghost("stinky", 376, 400),
@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
     new Ghost("clyde", 379, 200),
   ];
 
-  //draw my ghosts onto the grid
+  // Menampilkankan karakter hantu kedalam layar
   ghosts.forEach((ghost) => {
     squares[ghost.currentIndex].classList.add(ghost.className);
     squares[ghost.currentIndex].classList.add("ghost");
@@ -254,26 +254,20 @@ document.addEventListener("DOMContentLoaded", () => {
     let direction = directions[Math.floor(Math.random() * directions.length)];
 
     ghost.timerId = setInterval(function () {
-      //if the next square your ghost is going to go to does not have a ghost and does not have a wall
       if (
         !squares[ghost.currentIndex + direction].classList.contains("ghost") &&
         !squares[ghost.currentIndex + direction].classList.contains("wall")
       ) {
-        //remove the ghosts classes
         squares[ghost.currentIndex].classList.remove(ghost.className);
         squares[ghost.currentIndex].classList.remove("ghost", "scared-ghost");
-        //move into that space
         ghost.currentIndex += direction;
         squares[ghost.currentIndex].classList.add(ghost.className, "ghost");
-        //else find a new random direction to go in
       } else direction = directions[Math.floor(Math.random() * directions.length)];
 
-      //if the ghost is currently scared
       if (ghost.isScared) {
         squares[ghost.currentIndex].classList.add("scared-ghost");
       }
 
-      //if the ghost is currently scared and pacman is on it
       if (
         ghost.isScared &&
         squares[ghost.currentIndex].classList.contains("pac-man")
@@ -291,7 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, ghost.speed);
   }
 
-  //check for a game over
+  // Fungsi untuk menentukan apakah pertandingan berakhir
   function checkForGameOver() {
     if (
       squares[pacmanCurrentIndex].classList.contains("ghost") &&
@@ -301,7 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.removeEventListener("keyup", movePacman);
       pacmanVelocity.x = 0;
       pacmanVelocity.y = 0;
-      //display game over screen and refresh after 3s to rest game
+      //Tampilkan game di atas layar dan menyegarkan setelah 3s ke Game istirahat
       document.getElementById("game-over-screen").style.display = "flex";
       setTimeout(function () {
         window.location.reload();
@@ -309,14 +303,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  //check for a win - more is when this score is reached
+  // Fungsi untuk menentukan apakah pertandingan berhasil
   function checkForWin() {
     if (score === 274) {
       ghosts.forEach((ghost) => clearInterval(ghost.timerId));
       document.removeEventListener("keyup", movePacman);
       pacmanVelocity.x = 0;
       pacmanVelocity.y = 0;
-      //display you won screen and refresh after 3s to rest game
+      //Tampilan Anda memenangkan layar dan menyegarkan setelah 3s ke Game istirahat
       document.getElementById("you-won-screen").style.display = "flex";
       setTimeout(function () {
         window.location.reload();
@@ -324,16 +318,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  //start the game when enter is pressed
+  // Fungsi untuk memulai game jika tombol enter ditekan
   function startGame(event) {
     if (event.keyCode === 13) {
       document.removeEventListener("keydown", startGame);
-      //remove start screen
+      //Hapus Layar Mulai
       document.getElementById("start-screen").style.display = "none";
-      //set pacman velocity and enable movement
+      //Atur kecepatan pacman dan aktifkan gerakan
       document.addEventListener("keyup", setPacmanVelocity);
       movePacman();
-      // move the Ghosts randomly
+      // Pindahkan hantu secara acak
       ghosts.forEach((ghost) => moveGhost(ghost));
     }
   }
