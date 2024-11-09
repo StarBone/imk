@@ -348,7 +348,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   //check for a win - more is when this score is reached
   function checkForWin() {
-    if (score === 50) {
+    if (score === 274) {
       // Pastikan 274 adalah skor yang benar
       ghosts.forEach((ghost) => clearInterval(ghost.timerId));
       document.removeEventListener("keyup", movePacman);
