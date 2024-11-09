@@ -1,7 +1,54 @@
 document.addEventListener("DOMContentLoaded", () => {
   const scoreDisplay = document.getElementById("score");
-  const width = 28;
+  const usernameInput = document.getElementById("username-input");
+  const scoreTableBody = document.getElementById("score-table-body");
   let score = 0;
+  let username = "";
+
+  // Fungsi untuk menampilkan daftar skor dari Local Storage
+  function displayUserScores() {
+    scoreTableBody.innerHTML = "";
+    const userScores = JSON.parse(localStorage.getItem("userScores")) || [];
+
+    userScores.forEach((user) => {
+      const row = document.createElement("tr");
+      const usernameCell = document.createElement("td");
+      const scoreCell = document.createElement("td");
+
+      usernameCell.textContent = user.username;
+      scoreCell.textContent = user.score;
+
+      row.appendChild(usernameCell);
+      row.appendChild(scoreCell);
+      scoreTableBody.appendChild(row);
+    });
+  }
+
+  // Fungsi untuk menyimpan skor ke Local Storage
+  function saveScore() {
+    let userScores = JSON.parse(localStorage.getItem("userScores")) || [];
+    const existingUserIndex = userScores.findIndex(
+      (user) => user.username === username
+    );
+
+    const newScore = { username: username || "Guest", score };
+
+    if (existingUserIndex !== -1) {
+      // Update skor jika pengguna sudah ada
+      userScores[existingUserIndex].score = Math.max(
+        userScores[existingUserIndex].score,
+        score
+      );
+    } else {
+      // Tambahkan skor baru jika pengguna belum ada
+      userScores.push(newScore);
+    }
+
+    localStorage.setItem("userScores", JSON.stringify(userScores));
+    displayUserScores();
+  }
+
+  const width = 28;
   const grid = document.querySelector(".grid");
   const layout = [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -45,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const squares = [];
 
-  //Membuat board/papan
+  //create your board
   function createBoard() {
     for (let i = 0; i < layout.length; i++) {
       const square = document.createElement("div");
@@ -66,8 +113,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   createBoard();
 
-  //Membuat karakter
-  //membuat pacman masuk ke board
+  //create Characters
+  //draw pacman onto the board
   let pacmanCurrentIndex = 490;
   let pacmanVelocity = {
     x: 0,
@@ -82,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // console.log(getCoordinates(pacmanCurrentIndex))
 
-  //Mengatur kecepatan gerakan/velocity pacman
+  // set pacman velocity
   function setPacmanVelocity(e) {
     switch (e.keyCode) {
       case 37:
@@ -130,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log(pacmanVelocity, e.keyCode);
   }
 
-  //gerakan pacman
+  //move pacman
   function movePacman() {
     squares[pacmanCurrentIndex].classList.remove("pac-man");
     setInterval(() => {
@@ -190,40 +237,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }, pacmanSpeed);
   }
 
-  // fungsi untuk menentukan apakah pacman memakan pac-dot
+  // what happens when you eat a pac-dot
   function pacDotEaten() {
     if (squares[pacmanCurrentIndex].classList.contains("pac-dot")) {
       score++;
-      if (score < 50) {
-        document.getElementById("score").classList.add("low-score");
-      } else if (score > 100) {
-        document.getElementById("score").classList.add("mid-score");
-      } else if (score > 200) {
-        document.getElementById("score").classList.add("high-score");
-      }
       scoreDisplay.innerHTML = score;
       squares[pacmanCurrentIndex].classList.remove("pac-dot");
-      checkForWin();
+      checkForWin(); // Pastikan ini dipanggil di sini
     }
   }
 
-  // fungsi untuk menentukan apakah pacman memakan power-pellet
   function powerPelletEaten() {
     if (squares[pacmanCurrentIndex].classList.contains("power-pellet")) {
       score += 10;
       ghosts.forEach((ghost) => (ghost.isScared = true));
       setTimeout(unScareGhosts, 10000);
       squares[pacmanCurrentIndex].classList.remove("power-pellet");
-      checkForWin();
+      checkForWin(); // Pastikan ini dipanggil di sini
     }
   }
 
-  // Membuat hantu menjadi passive
+  //make the ghosts stop flashing
   function unScareGhosts() {
     ghosts.forEach((ghost) => (ghost.isScared = false));
   }
 
-  // Membuat karakter hantu
+  //create ghosts using Constructors
   class Ghost {
     constructor(className, startIndex, speed) {
       this.className = className;
@@ -235,7 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Semua karakter hantu
+  //all my ghosts
   ghosts = [
     new Ghost("blinky", 348, 100),
     new Ghost("stinky", 376, 400),
@@ -243,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
     new Ghost("clyde", 379, 200),
   ];
 
-  // Menampilkankan karakter hantu kedalam layar
+  //draw my ghosts onto the grid
   ghosts.forEach((ghost) => {
     squares[ghost.currentIndex].classList.add(ghost.className);
     squares[ghost.currentIndex].classList.add("ghost");
@@ -254,20 +293,26 @@ document.addEventListener("DOMContentLoaded", () => {
     let direction = directions[Math.floor(Math.random() * directions.length)];
 
     ghost.timerId = setInterval(function () {
+      //if the next square your ghost is going to go to does not have a ghost and does not have a wall
       if (
         !squares[ghost.currentIndex + direction].classList.contains("ghost") &&
         !squares[ghost.currentIndex + direction].classList.contains("wall")
       ) {
+        //remove the ghosts classes
         squares[ghost.currentIndex].classList.remove(ghost.className);
         squares[ghost.currentIndex].classList.remove("ghost", "scared-ghost");
+        //move into that space
         ghost.currentIndex += direction;
         squares[ghost.currentIndex].classList.add(ghost.className, "ghost");
+        //else find a new random direction to go in
       } else direction = directions[Math.floor(Math.random() * directions.length)];
 
+      //if the ghost is currently scared
       if (ghost.isScared) {
         squares[ghost.currentIndex].classList.add("scared-ghost");
       }
 
+      //if the ghost is currently scared and pacman is on it
       if (
         ghost.isScared &&
         squares[ghost.currentIndex].classList.contains("pac-man")
@@ -285,7 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, ghost.speed);
   }
 
-  // Fungsi untuk menentukan apakah pertandingan berakhir
+  //check for a game over
   function checkForGameOver() {
     if (
       squares[pacmanCurrentIndex].classList.contains("ghost") &&
@@ -295,22 +340,25 @@ document.addEventListener("DOMContentLoaded", () => {
       document.removeEventListener("keyup", movePacman);
       pacmanVelocity.x = 0;
       pacmanVelocity.y = 0;
-      //Tampilkan game di atas layar dan menyegarkan setelah 3s ke Game istirahat
+      saveScore();
       document.getElementById("game-over-screen").style.display = "flex";
-      setTimeout(function () {
-        window.location.reload();
-      }, 3000);
+      setTimeout(() => window.location.reload(), 3000);
     }
   }
 
-  // Fungsi untuk menentukan apakah pertandingan berhasil
+  //check for a win - more is when this score is reached
   function checkForWin() {
-    if (score === 274) {
+    if (score === 50) {
+      // Pastikan 274 adalah skor yang benar
       ghosts.forEach((ghost) => clearInterval(ghost.timerId));
       document.removeEventListener("keyup", movePacman);
       pacmanVelocity.x = 0;
       pacmanVelocity.y = 0;
-      //Tampilan Anda memenangkan layar dan menyegarkan setelah 3s ke Game istirahat
+
+      // Simpan skor sebelum menampilkan layar kemenangan
+      saveScore();
+
+      // Tampilkan layar kemenangan
       document.getElementById("you-won-screen").style.display = "flex";
       setTimeout(function () {
         window.location.reload();
@@ -318,19 +366,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Fungsi untuk memulai game jika tombol enter ditekan
+  //start the game when enter is pressed
   function startGame(event) {
-    if (event.keyCode === 13) {
-      document.removeEventListener("keydown", startGame);
-      //Hapus Layar Mulai
+    if (event.keyCode === 13 && usernameInput.value.trim() !== "") {
+      username = usernameInput.value.trim();
+      usernameInput.style.display = "none";
       document.getElementById("start-screen").style.display = "none";
-      //Atur kecepatan pacman dan aktifkan gerakan
       document.addEventListener("keyup", setPacmanVelocity);
       movePacman();
-      // Pindahkan hantu secara acak
       ghosts.forEach((ghost) => moveGhost(ghost));
     }
   }
 
+  // Memanggil fungsi displayUserScores saat halaman dimuat
+  displayUserScores();
+
+  // Event listener untuk memulai permainan
   document.addEventListener("keydown", startGame);
+
+  document.getElementById("reset-score").addEventListener("click", () => {
+    localStorage.removeItem("userScores");
+    console.log("Username dan skor berhasil dihapus.");
+    // Memanggil ulang fungsi untuk memperbarui tabel skor setelah penghapusan
+    displayUserScores();
+  });
 });

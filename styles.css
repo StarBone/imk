@@ -116,7 +116,7 @@ h2 {
 #start-screen h1 {
   color: white;
   font-size: 4rem;
-  margin-top: 40vh;
+  margin-top: 15vh;
   margin-bottom: 40px;
   animation: colours 0.4s infinite;
 }
@@ -145,6 +145,43 @@ h2 {
   justify-content: center;
   animation: blink 0.8s infinite;
   display: none;
+}
+
+#username-input {
+  font-family: "PressStart2P";
+  background-color: #333;
+  border: 1px solid white;
+  margin-bottom: 1rem;
+  padding: 0.5rem 3rem;
+  text-align: center;
+}
+
+#score-table {
+  width: 80%;
+  margin-top: 20px;
+  border-collapse: collapse;
+  color: white;
+}
+
+#score-table th,
+#score-table td {
+  padding: 10px;
+  border: 1px solid white;
+  text-align: center;
+}
+
+#score-table th {
+  background-color: #333;
+}
+
+#reset-score {
+  font-family: "PressStart2P";
+  color: white;
+  background-color: #333;
+  border: 1px solid white;
+  margin-top: 1rem;
+  padding: 0.5rem 3rem;
+  text-align: center;
 }
 
 .overlay-screen {
